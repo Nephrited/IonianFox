@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="ionianFox" ng-controller="appCtrl">
+<head>
+	<meta charset="UTF-8">
+	<title>An Ionian Fox</title>
+
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="./bower_components/angular-material/angular-material.min.css">
+
+	<script src="./bower_components/angular/angular.js"></script>
+	<script src="./bower_components/angular-route/angular-route.js"></script>
+	<script src="./bower_components/angular-aria/angular-aria.js"></script>
+	<script src="./bower_components/angular-animate/angular-animate.js"></script>
+	<script src="./bower_components/angular-resource/angular-resource.js"></script>
+	<script src="./bower_components/angular-material/angular-material.js"></script>
+
+	<script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script>
+	<script src="https://cdn.firebase.com/libs/angularfire/1.1.3/angularfire.min.js"></script>
+
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+	<script src="./js/app.js"></script>
+	<script src="./js/controllers.js"></script>
+	<script src="./js/services.js"></script>
+	
+	<link rel="stylesheet" href="./css/main.css">
+
+</head>
+<body>
+	<div layout="column" layout-fill>
+		<header>
+			<md-toolbar class="md-whiteframe-10dp md-hue-3">
+				<div class="md-toolbar-tools">
+					<span>An Ionian Fox</span>
+					<span flex></span>
+				</div>
+			</md-toolbar>
+		</header>
+		<md-content ng-view layout="column" flex>
+		</md-content>
+		<footer>
+			<md-toolbar class="md-tall md-whiteframe-10dp md-hue-3">
+				<span flex></span>
+				<span class="md-caption" id="legal">Ionian Fox isn’t endorsed by Riot Games and doesn’t reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.</span>
+			</md-toolbar>
+		</footer>
+	</div>
+</body>
+</html>

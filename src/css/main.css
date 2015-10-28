@@ -1,0 +1,16 @@
+body {
+	height: 100%;
+}
+
+#legal {
+	text-align: center;
+	padding: 1em;
+}
+
+.md-title {
+	margin-top: 0px;
+}
+
+.iof-icon-margin {
+	margin-left: 32px;
+}

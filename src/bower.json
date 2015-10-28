@@ -1,0 +1,26 @@
+{
+  "name": "Ionian Fox",
+  "homepage": "https://github.com/Nephrited/IonianFox",
+  "authors": [
+    "Jade Beesley <kibeekireas@gmail.com>"
+  ],
+  "description": "",
+  "main": "index.html",
+  "moduleType": [],
+  "license": "None",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-resource": "~1.4.7",
+    "angular-route": "~1.4.7",
+    "angular-material": "~0.11.4",
+    "angular-messages": "~1.4.7",
+    "angular": "1.4.7"
+  }
+}
