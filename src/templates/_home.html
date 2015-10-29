@@ -2,8 +2,8 @@
 	<md-card class="md-hue-1">
 		<md-card-content>
 			<h2 class="md-title">Free Rotation</h2>		
-			<md-list layout="row" layout-wrap>
-				<md-list-item class="flex-33" ng-repeat="champion in rotation">
+			<md-list layout="row" layout-sm="column" layout-wrap>
+				<md-list-item flex-gt-sm="33" ng-repeat="champion in rotation">
 					<img class="md-avatar" ng-src="http://ddragon.leagueoflegends.com/cdn/5.21.1/img/champion/{{championData(champion.id).image.full}}">
 						<span>{{championData(champion.id).name}}</span>
 					</md-list-item>
@@ -14,9 +14,9 @@
 	<md-card class="md-hue-1">
 		<md-card-content layout="column">
 
-			<div layout="row" layout-fill>
-				<span class="md-title" flex="67">Shard Status</span>
-				<md-input-container flex="33">
+			<div layout="row" layout-sm="column" layout-fill>
+				<span class="md-title" flex-gt-sm="67">Shard Status</span>
+				<md-input-container flex-gt-sm="33">
 					<label>Region</label>
 					<md-select ng-model="options.region" ng-change="updateStatus(options.region)">
 						<md-option ng-repeat="shard in shards" value="{{shard.slug}}">
@@ -25,8 +25,8 @@
 					</md-select>
 				</md-input-container>
 	        </div>
-			<md-list layout="row" flex>
-				<md-list-item ng-repeat="service in data.status.services" flex="25">
+			<md-list layout="row" layout-sm="column" flex>
+				<md-list-item ng-repeat="service in data.status.services" flex-gt-sm="25">
 					<md-icon class="md-avatar-icon iof-icon-margin">{{statusCheck(service.status)}}</md-icon>
 						<span>{{service.name}}</span>
 					</md-list-item>

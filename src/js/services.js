@@ -29,14 +29,14 @@ angular.module('services', [])
 	};
 })
 
-.factory('dataCall', function($resource,riotApi,$q,staticData) {
+.factory('dataCall', function($resource,$q,staticData,ionia) {
 
 	return {
 		freeRotation: function() {
-			var requestURL = riotApi.euw+"champion?freeToPlay=true&api_key="+riotApi.key;
+			var requestURL = ionia.url+"rotation";
 			return $resource(requestURL);
 		},staticChampions: function() {
-			var requestURL = riotApi.static+"champion?api_key="+riotApi.key+"&champData=image";
+			var requestURL = ionia.url+"champions";
 			var defer = $q.defer();
 
 			$resource(requestURL).get(function(data) {
@@ -46,7 +46,7 @@ angular.module('services', [])
 
 			return defer.promise;
 		},shards: function() {
-			var requestURL = "http://status.leagueoflegends.com/shards";
+			var requestURL = ionia.url+"shards";
 			var defer = $q.defer();
 			
 			$resource(requestURL).query(function(data) {
@@ -56,7 +56,7 @@ angular.module('services', [])
 
 			return defer.promise;
 		},shardStatus: function(shard) {
-			var requestURL = "http://status.leagueoflegends.com/shards/"+shard;
+			var requestURL = ionia.url+"shards/"+shard;
 			return $resource(requestURL);
 		}
 	};

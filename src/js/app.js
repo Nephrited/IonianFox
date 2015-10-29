@@ -1,9 +1,8 @@
 angular.module('ionianFox', ['controllers','services','ngRoute','ngMaterial','ngResource','firebase'])
 
-.constant("riotApi", {
-	"key": "7f2f2ee9-63ea-4c78-8a1e-5307bbeacbf6",
-	"euw": "https://euw.api.pvp.net/api/lol/euw/v1.2/",
-	"static": "https://global.api.pvp.net/api/lol/static-data/euw/v1.2/"
+.constant("ionia", {
+	//"url": "http://52.17.103.200:46642/api/",
+	"url": "http://localhost:46642/api/"
 })
 
 .config(function($routeProvider,$mdThemingProvider,$mdIconProvider) {
