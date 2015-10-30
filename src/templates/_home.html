@@ -3,9 +3,9 @@
 		<md-card-content>
 			<h2 class="md-title">Free Rotation</h2>		
 			<md-list layout="row" layout-sm="column" layout-wrap>
-				<md-list-item flex-gt-sm="33" ng-repeat="champion in rotation">
-					<img class="md-avatar" ng-src="http://ddragon.leagueoflegends.com/cdn/5.21.1/img/champion/{{championData(champion.id).image.full}}">
-						<span>{{championData(champion.id).name}}</span>
+				<md-list-item flex-gt-sm="33" ng-repeat="champion in rotation | orderBy:'name'">
+					<img class="md-avatar" ng-src="http://ddragon.leagueoflegends.com/cdn/5.21.1/img/champion/{{champion.image.full}}">
+						<span>{{champion.name}}</span>
 					</md-list-item>
 				</md-list-item>
 			</md-list>

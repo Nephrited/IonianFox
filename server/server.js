@@ -237,10 +237,22 @@ app.use(function(req, res, next) {
 /**
  * Respond to rotation queries
  */
-router.get('/rotation', cache('1 hour'), function(req,res) {
+router.get('/rotation', cache('30 minutes'), function(req,res) {
 	fetchRotation(function(err,data) {
 		if(!err) {
-			res.json(data);
+			var rotationArray = [];
+			data.champions.forEach(function(championData) {
+				rotationArray.push(championData.id);
+			});
+
+			database.collection('champions').find({"id":{$in:rotationArray}},{"id":true,"name":true,"image.full":true})
+				.toArray(function(err,result) {
+				if(!err) {
+					res.json(result);
+				} else {
+					console.log(err);
+				}
+			});
 		} else {
 			console.log(err);
 		}
@@ -284,7 +296,12 @@ app.use(function (err, req, res, next) {
 
 //asyncSetup.push(fetchRotation,fetchChampions,fetchVersion);
 
-
+/**
+ * Get initial data in series
+ * @param  {[type]} err   [description]
+ * @param  {[type]} data) {	if(!err)   {		if(data[2] [description]
+ * @return {[type]}       [description]
+ */
 async.series([connectDb,fetchVersion,staticVersionCheck], function(err,data) {
 	if(!err) {
 		if(data[2] === true) {
@@ -297,6 +314,10 @@ async.series([connectDb,fetchVersion,staticVersionCheck], function(err,data) {
 	}
 });
 
+/**
+ * Fetch all static data
+ * @return {[type]} [description]
+ */
 function fetchStatic() {
 	async.parallel([fetchChampions,fetchShards],function(err,data) {
 		if(!err) {

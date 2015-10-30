@@ -5,17 +5,9 @@ angular.module('controllers', ['services'])
 		$scope.options = {};
 		$scope.data = {};
 
-		// var fireRef = new Firebase("https://ionia.firebaseio.com");
-		// var champions = $firebaseObject(fireRef);
-		// champions.$bindTo($scope, "champions");
-
-		dataCall.freeRotation().get(function(data) {
-			$scope.rotation = data.champions;
+		dataCall.freeRotation().query(function(data) {
+			$scope.rotation = data;
 		});
-
-		$scope.championData = function(championId) {
-			return staticData.getChampion(championId);
-		};
 
 		$scope.shards = staticData.getShards();
 		$scope.options.region = $scope.shards[0].slug;

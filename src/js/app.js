@@ -13,9 +13,7 @@ angular.module('ionianFox', ['controllers','services','ngRoute','ngMaterial','ng
 		templateUrl: './templates/_home.html',
 		controller: 'homeCtrl',
 		resolve:  {
-			loadChampions: function(dataCall) {
-				return dataCall.staticChampions();
-			},loadShards: function(dataCall) {
+			loadShards: function(dataCall) {
 				return dataCall.shards();
 			}
 		}
