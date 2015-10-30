@@ -1,8 +1,8 @@
-angular.module('ionianFox', ['controllers','services','ngRoute','ngMaterial','ngResource','firebase'])
+angular.module('ionianFox', ['controllers','services','ngRoute','ngMaterial','ngResource','ngAnimate'])
 
 .constant("ionia", {
-	//"url": "http://52.17.103.200:46642/api/",
-	"url": "http://localhost:46642/api/"
+	"url": "http://52.17.103.200:46642/api/",
+	//"url": "http://localhost:46642/api/"
 })
 
 .config(function($routeProvider,$mdThemingProvider,$mdIconProvider) {
@@ -11,24 +11,19 @@ angular.module('ionianFox', ['controllers','services','ngRoute','ngMaterial','ng
 
 	$routeProvider.when('/', {
 		templateUrl: './templates/_home.html',
-		controller: 'homeCtrl',
-		resolve:  {
-			loadShards: function(dataCall) {
-				return dataCall.shards();
-			}
-		}
+		controller: 'homeCtrl'
 	});
 
-  	$mdThemingProvider.theme('default')
-	  	.primaryPalette('grey', {
-	      'default': '100',
-	      'hue-1': '500',
-	      'hue-2': '600',
-	      'hue-3': '900'
-	    })
+	$mdThemingProvider.theme('default')
+		.primaryPalette('grey', {
+		  'default': '100',
+		  'hue-1': '500',
+		  'hue-2': '600',
+		  'hue-3': '900'
+		})
 
-	    .accentPalette('purple', {
-	      'default': '200'
-	    })
-	    .dark();
+		.accentPalette('purple', {
+		  'default': '200'
+		})
+		.dark();
 });

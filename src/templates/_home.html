@@ -1,9 +1,12 @@
 <div flex>
-	<md-card class="md-hue-1">
+	<md-card class="md-hue-1 element-relative">
 		<md-card-content>
-			<h2 class="md-title">Free Rotation</h2>		
+			<h2 class="md-title">Free Rotation</h2>
+			<div class="spinner-container">
+				<md-progress-circular md-mode="indeterminate" ng-show="spinners.rotation"></md-progress-circular>
+			</div>
 			<md-list layout="row" layout-sm="column" layout-wrap>
-				<md-list-item flex-gt-sm="33" ng-repeat="champion in rotation | orderBy:'name'">
+				<md-list-item flex-gt-sm="33" ng-repeat="champion in rotation | orderBy:'name'" ng-click="openChampion($event,champion.id)">
 					<img class="md-avatar" ng-src="http://ddragon.leagueoflegends.com/cdn/5.21.1/img/champion/{{champion.image.full}}">
 						<span>{{champion.name}}</span>
 					</md-list-item>
@@ -11,11 +14,13 @@
 			</md-list>
 		</md-card-content>
 	</md-card>
-	<md-card class="md-hue-1">
+	<md-card class="md-hue-1 element-relative">
 		<md-card-content layout="column">
-
 			<div layout="row" layout-sm="column" layout-fill>
 				<span class="md-title" flex-gt-sm="67">Shard Status</span>
+				<div class="spinner-container">
+					<md-progress-circular md-mode="indeterminate" ng-show="spinners.shards"></md-progress-circular>
+				</div>
 				<md-input-container flex-gt-sm="33">
 					<label>Region</label>
 					<md-select ng-model="options.region" ng-change="updateStatus(options.region)">

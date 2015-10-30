@@ -93,7 +93,7 @@ function staticVersionCheck(callback) {
 
 	async.parallel([latestVersion,champions],function(err,data) {
 		if(!err) {
-			if(data[0].version != data[1].version) {
+			if((data[0].version != data[1].version) && data[0].version != 0) {
 				//False = Out of Sync
 				return callback(null,false);
 			} else {
@@ -259,16 +259,19 @@ router.get('/rotation', cache('30 minutes'), function(req,res) {
 	});
 });
 
-/**
- * Return static champion data
- */
-router.get('/champions', cache('1 hour'), function(req,res) {
-	res.json(staticTemp.champions);
-});
-
 router.get('/shards', cache('1 week'), function(req,res) {
 	fetchShards(function() {
 		res.json(staticTemp.shards);
+	});
+});
+
+router.get('/champion/:id',cache('1 hour'), function(req,res) {
+	database.collection('champions').findOne({"id":+req.params.id},function(err,result) {
+		if(!err) {
+			res.json(result);
+		} else {
+			console.log(err);
+		}
 	});
 });
 
