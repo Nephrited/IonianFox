@@ -2,10 +2,17 @@ var express 	= require('express');
 var request 	= require('request');
 var async 		= require('async');
 var apicache	= require('apicache');
+var fs 			= require('fs');
+var path		= require('path');
+var mongo		= require('mongodb').MongoClient;
 
 var app 		= express();
 var router 		= express.Router();
 var cache 		= apicache.options({debug:true}).middleware;
+
+var url = 'mongodb://localhost:27017/ionia';
+var database;
+var collection;
 
 var port 		= 46642;
 var api 		= {
@@ -25,24 +32,79 @@ console.log('Soon you shall arrive"');
 console.log("");
 
 /**
+ * Connect to database
+ */
+function connectDb(callback) {
+	mongo.connect(url, function(err, db) {
+		if(!err) {
+			database = db;
+			return callback(null);
+		} else {
+			return callback(err);
+		}
+	});
+}
+
+/**
  * Fetch the latest league version.
  *
  * This is to be compared to the stored copy to see if an update is required.
  */
 function fetchVersion(callback) {
-	request(api.euw+"versions", function(err,res,body) {
+	request(api.static+"realm?api_key="+api.key, function(err,res,body) {
 		if(!err && res.statusCode === 200) {
-			var data = JSON.parse(body);
-			console.log(data);
-			staticTemp.version = data;
+			var data = JSON.parse(body).v;
+			var store = {"version":data};
+			database.collection('versions').update(store,store,{upsert:true});
+			return callback(null,data);
 		} else if(!err) {
-			console.log("Error "+res.status_code);
+			errorData = JSON.parse(body);
+			return callback(errorData.status.message);
 		} else {
-			console.log(err);
+			return callback(err);
 		}
-
-		return callback();
 	});
+}
+
+function staticVersionCheck(callback) {
+	function champions(callback) {
+		database.collection('champions').findOne({"version":{$exists:true}}, function(err,res) {
+			if(!err && res !== null) {
+				return callback(null,res);
+			} else if (!err) {
+				return callback(null,{"version": 0});
+			} else {
+				return callback(err);
+			}
+		});
+	}
+
+	function latestVersion(callback) {
+		database.collection('versions').findOne({}, function(err,res) {
+			if(!err && res !== null) {
+				return callback(null,res);
+			} else if (!err) {
+				return callback(null,{"version": 0});
+			} else {
+				return callback(err);
+			}
+		});
+	}
+
+	async.parallel([latestVersion,champions],function(err,data) {
+		if(!err) {
+			if(data[0].version != data[1].version) {
+				//False = Out of Sync
+				return callback(null,false);
+			} else {
+				//True = In Sync
+				return callback(null,true);
+			}
+		} else {
+			return callback(err);
+		}
+	});
+
 }
 
 /**
@@ -50,16 +112,18 @@ function fetchVersion(callback) {
  * To be completed
  * @param  {[type]} callback) {	request(api.euw+"champion?freeToPlay [description]
  * @return {[type]}           [description]
+ *
+ * Redo me to use callbacks properly
  */
 function fetchRotation(callback) {
 	request(api.euw+"champion?freeToPlay=true&api_key="+api.key, function(err,res,body){
 		if(!err && res.statusCode === 200) {
 			var data = JSON.parse(body);
-			staticTemp.rotation = data;
+			return callback(null,data);
 		} else if(!err) {
-			console.log("Error "+res.status_code);
+			return callback(res.status_code);
 		} else {
-			console.log(err);
+			return callback(err);
 		}
 
 		return callback();
@@ -70,23 +134,55 @@ function fetchRotation(callback) {
  * Fetches champion data.
  * @param  {String} callback) {	request(api.static+"champion?api_key [description]
  * @return {[type]}           [description]
+ *
+ * Redo me to use my callbacks properly
  */
 function fetchChampions(callback) {
-	request(api.static+"champion?api_key="+api.key+"&champData=image", function(err,res,body){
+
+	request(api.static+"champion?api_key="+api.key+"&champData=all", function(err,res,body){
 		var data = JSON.parse(body);
+		var championData = [];
+
+		for(var champion in data.data){
+		    championData.push(data.data[champion]);
+		}
+
+		championData.push({"version":data.version});
 
 		if(!err && res.statusCode === 200) {
+
+			database.collection('champions').deleteMany({}, function(err,res) {
+				if(!err) {
+					database.collection('champions').insert(championData);
+				} else {
+					return callback(err);
+				}
+			});
+			
 			staticTemp.champions = data;
+
+			// //Log to file
+			// fs.writeFile(path.join(__dirname,"./logs/champions.log"), JSON.stringify(championData), function(err) {
+			// 	if(err) {
+			// 		return console.log(err);
+			// 	}
+			// }); 
+
 		} else if(!err) {
-			console.log("Error "+data.status.status_code+": "+data.status.message);
+			return callback("Error "+data.status.status_code+": "+data.status.message);
 		} else {
-			console.log(err);
+			return callback(err);
 		}
 
 		return callback();
 	});
 }
 
+/**
+ * [fetchShards description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
 function fetchShards(callback) {
 	request(api.shards, function(err,res,body) {
 		var data = JSON.parse(body);
@@ -94,15 +190,21 @@ function fetchShards(callback) {
 		if(!err && res.statusCode === 200) {
 			staticTemp.shards = data;
 		} else if(!err) {
-			console.log("Error "+data.status.status_code+": "+data.status.message);
+			return callback("Error "+data.status.status_code+": "+data.status.message);
 		} else {
-			console.log(err);
+			return callback(err);
 		}
 
 		return callback();
 	});
 }
 
+/**
+ * [fetchShardStatus description]
+ * @param  {[type]}   shard    [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
 function fetchShardStatus(shard,callback) {
 	request(api.shards+"/"+shard, function(err,res,body) {
 		try {
@@ -111,9 +213,9 @@ function fetchShardStatus(shard,callback) {
 			if(!err && res.statusCode === 200) {
 				return callback(null,data);
 			} else if(!err) {
-				console.log("Error "+data.status.status_code+": "+data.status.message);
+				return callback("Error "+data.status.status_code+": "+data.status.message);
 			} else {
-				console.log(err);
+				return callback(err);
 			}
 		} catch(e) {
 			return callback("Unable to parse data:"+e);
@@ -135,16 +237,20 @@ app.use(function(req, res, next) {
 /**
  * Respond to rotation queries
  */
-router.get('/rotation', cache('60 minutes'), function(req,res) {
-	fetchRotation(function() {
-		res.json(staticTemp.rotation);
+router.get('/rotation', cache('1 hour'), function(req,res) {
+	fetchRotation(function(err,data) {
+		if(!err) {
+			res.json(data);
+		} else {
+			console.log(err);
+		}
 	});
 });
 
 /**
  * Return static champion data
  */
-router.get('/champions', cache('24 hours'), function(req,res) {
+router.get('/champions', cache('1 hour'), function(req,res) {
 	res.json(staticTemp.champions);
 });
 
@@ -176,11 +282,31 @@ app.use(function (err, req, res, next) {
 	}
 });
 
-asyncSetup.push(fetchRotation,fetchChampions,fetchVersion);
+//asyncSetup.push(fetchRotation,fetchChampions,fetchVersion);
 
-async.parallel(asyncSetup, function() {
-	setupComplete();
+
+async.series([connectDb,fetchVersion,staticVersionCheck], function(err,data) {
+	if(!err) {
+		if(data[2] === true) {
+			setupComplete();
+		} else {
+			fetchStatic();
+		}
+	} else {
+		console.log(err);
+	}
 });
+
+function fetchStatic() {
+	async.parallel([fetchChampions,fetchShards],function(err,data) {
+		if(!err) {
+			console.log("The tomes have been updated");
+			setupComplete();
+		} else {
+			console.log(err);
+		}
+	});
+}
 
 /**
  * Bind to port and link to router
@@ -191,6 +317,6 @@ function setupComplete() {
 	console.log('Ready for your orders, summoner');
 }
 
-app.listen(port, function() {
+var server = app.listen(port, function() {
 	console.log('A server of Ionian descent is listening on port '+port);
 });
